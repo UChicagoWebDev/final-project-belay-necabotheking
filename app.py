@@ -67,9 +67,14 @@ def create_auth_key():
 @app.route('/channels')
 @app.route('/login')
 @app.route('/channels/replies/')
+@app.route('/channels/replies/<reply_id>')
 @app.route('/channels/<channel_id>')
-def index(channel_id=None):
+def index(channel_id=None, reply_id=None):
     return app.send_static_file('index.html')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return app.send_static_file('404.html'), 404
 
 
 # -------------------------------- API ROUTES ----------------------------------
@@ -188,6 +193,37 @@ def post_message(channel_id):
 
 
 
+#TODO:
+#POST request to reply to a thread of messages
+@app.route('/api/channels/replies/<int:reply_id>/messages', methods=['POST'])
+def post_thread_reply(reply_id):
+    
+    session_token = request.headers.get('Authorization')
+    data = request.get_json()
+    
+    if check_auth_key(session_token):
+        
+        message = data.get("body") 
+        username = data.get("username")
+        parent_id = data.get("replies_to")
+        
+        # Retrieve user_id from the database
+        user_id = query_db('SELECT id FROM users WHERE name = ?', [username], one=True)
+        
+        channel_id = query_db('SELECT id FROM messages WHERE id = ?', [parent_id], one=True)
+        
+        if user_id:
+
+            # Insert the new reply into the messages table with replies_to 
+            query_db('INSERT INTO messages (body, user_id, channel_id, replies_to) VALUES (?, ?, ?, ?)', [message, user_id['id'], channel_id['id'], parent_id])
+            print('POSTED MESSAGE')
+        else:
+            print('User not found')
+        
+    return {}
+
+
+
 #POST request to add a new channel into the database (and return the ID?)
 @app.route('/api/channels/newchannel', methods=['POST'])
 def create_new_channel():
@@ -243,7 +279,7 @@ def get_channel_messages(channel_id):
             if row['replies_to'] is None:
                 messages_dict['replies_count'] = 0
             else:
-                print("IMPLEMENT THE REPLY COUNTER")
+                messages_dict['replies_count'] = 0
             
             messages_lst.append(messages_dict)
         return jsonify(messages_lst)
@@ -262,10 +298,76 @@ def get_room_id(channel_id):
         return jsonify({"success": False, "message": "Room not found"}), 404    
 
 
-#TODO:
 # GET request to get display all the messages (and reactions, and threads) in a channel
+@app.route('/api/channels/replies/<int:reply_id>/messages', methods=['GET'])
+def show_thread_messages(reply_id):
+    
+    parent_message = query_db("SELECT channel_id FROM messages WHERE id = ?;", [reply_id], one=True)
+    
+    parent_channel_id = parent_message['channel_id']
+    
+    # reply id to get the channel then show all of those messages
+    messages = query_db("SELECT messages.id, messages.body, messages.user_id, messages.channel_id, messages.replies_to, users.name AS author FROM messages JOIN users ON messages.user_id = users.id  WHERE messages.channel_id = ? AND messages.replies_to IS NULL;", [parent_channel_id])
+    
+    if not messages:
+        return jsonify({"success": False, "message": "No messages found for this room."}), 404
+    else:
+        messages_lst = []
+        
+        # Loop through SQL lite row objects and create list of dicts
+        for row in messages:
+            messages_dict = {}
+            messages_dict['id'] = row['id']
+            messages_dict ['user_id'] = row['user_id'] 
+            messages_dict['channel_id'] = row['channel_id']
+            messages_dict['body'] = row['body']
+            messages_dict['author'] = row['author']
+            messages_dict['replies_count'] = 0
+            
+            
+            messages_lst.append(messages_dict)
+            
+        return jsonify(messages_lst)
+    
  
  
+# GET request for the channels in the threads page 
+@app.route('/api/channels/replies/getchannels', methods=['GET'])
+def get_thread_channels():
+    
+    rooms = query_db('SELECT * FROM channels;', args=(), one=False)
+
+    if rooms:
+        rooms_list = [{"id": room["id"], "name": room["name"]}
+                      for room in rooms]
+        return jsonify({"success": True, "rooms": rooms_list})
+    else:
+        return jsonify({"success": False, "message": "No Rooms Found"}), 404
  
-#TODO:
+
 # Get request to open and show replies
+@app.route('/api/channels/replies/<int:reply_id>/getmessages', methods=['GET'])
+def get_replies(reply_id):
+    
+    
+    replies = query_db('SELECT messages.id, messages.user_id, messages.channel_id, messages.body, messages.replies_to, users.name AS name FROM messages JOIN users ON messages.user_id = users.id  WHERE messages.replies_to = ?;', [reply_id])
+    
+    if replies:
+        reply_lst = []
+        
+        # Loop through SQL lite row objects and create list of dicts
+        for row in replies:
+            reply_dict = {}
+            reply_dict['id'] = row['id']
+            reply_dict ['user_id'] = row['user_id'] 
+            reply_dict['channel_id'] = row['channel_id']
+            reply_dict['body'] = row['body']
+            reply_dict['author'] = row['name']
+            reply_dict['replies_to'] = reply_id
+            
+            reply_lst.append(reply_dict)
+        
+        
+        return jsonify(reply_lst)
+    else: 
+        return {}

@@ -254,11 +254,20 @@ hr {
   border-color: #350d36;
 }
 
+textarea {
+    background-color: #f8f8f8;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    height: 150px;
+}
 
 #post-box1,  #post-box2{
-  height:50px;
-  width: 100%;
-  position: relative;
+    background-color: #f8f8f8;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    height: 150px;
 }
 
 #post-button1,  #post-button2 {
@@ -266,6 +275,11 @@ hr {
   font-size:15px;
   margin-top: 5px;
   
+}
+
+#thread-container {
+    background-color: white;
+    color: black;
 }
 
 button.reaction {
@@ -310,7 +324,7 @@ button.reaction#exit-threads {
   border-radius: 70%
 }
 
-#reply-button  {
+#reply-btn  {
   float: right;
   margin-top: 5px;
 }

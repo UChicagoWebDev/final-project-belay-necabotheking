@@ -58,6 +58,10 @@ function handleNavigation() {
             showThis(LOGIN);
         } else {
             showThis(THREAD);
+            displayThreadChannels()
+            fetchReplyMessages()
+            const reply_id = parseInt(path.split('/channels/replies/')[1]);
+            handleThreadDisplay(reply_id);
             document.querySelectorAll(".username").forEach(usernameElement => {
                 usernameElement.textContent = `${user}`;
             });
@@ -150,6 +154,11 @@ function handleUIClickEvents() {
         postNewMessage.addEventListener('click', () => {
         postMessage();
     })
+
+    const postReplyMessage = document.getElementById('reply-btn')
+        postReplyMessage.addEventListener('click', () => {
+        postThreadReply();
+        })
 
     const addChannelButton = document.getElementById("create-channel");
     const addChannelButton2 = document.getElementById("create-channel2");
@@ -433,8 +442,18 @@ function postMessage() {
       let buttonElement = document.createElement("button");
       buttonElement.textContent = `${single_message.replies_count} replies`
 
+      buttonElement.addEventListener('click', () => {
+        console.log(`checking out this thread with message_id: ${single_message.id}! `)
+
+            message_id = single_message.id
+            channel_id = single_message.channel_id
+            //handleThreadDisplay(message_id, channel_id )
+        window.location.href = `/channels/replies/${message_id}`
+        //handleThreadDisplay(message_id, channel_id )
+      })
+
+
       messageElement.appendChild(authorElement);
-      //messageElement.appendChild(document.createElement('br'));
       messageElement.appendChild(contentElement);
       messageElement.appendChild(buttonElement)
       messageElement.appendChild(document.createElement('br'))
@@ -538,6 +557,52 @@ function displayChannels() {
   }
 
 
+function displayThreadChannels() {
+    const path = window.location.pathname;
+    const reply_id = parseInt(path.split('/channels/replies/')[1]);
+
+    fetch(`/api/channels/replies/getchannels`)
+    .then(response => response.json()) 
+    .then(data => {
+      if (data.success) {
+
+        const channelsContainer = document.getElementById('channels-3col');
+            channelsContainer.innerHTML = ''; // Clear previous content
+            
+            // Loop through each channel and create HTML elements
+            data.rooms.forEach(channel => {
+                const channelOption = document.createElement('div');
+                channelOption.classList.add('channel-option');
+                channelOption.setAttribute('number', channel.id);
+
+                const nameElement = document.createElement('name');
+                nameElement.textContent = channel.name;
+
+                const unreadElement = document.createElement('unread');
+                unreadElement.textContent = '0 unread';;
+
+                // Append name and unread elements to the channel option
+                channelOption.appendChild(nameElement);
+                channelOption.appendChild(document.createElement('br')); // Add line break
+                channelOption.appendChild(unreadElement);
+
+                // Append channel option to the channels container
+                channelsContainer.appendChild(channelOption);
+
+      channelOption.addEventListener('click', () => {
+        roomID = channel.id
+        console.log(`Going to channel ${roomID} !`);
+        window.location.href = `/channels/${roomID}`
+        fetchMessages(roomID)
+      });
+    });
+  } else {
+    console.log(data.message)   
+  }
+})}
+
+
+
 //  POST to create a new channel
 function handleNewChannel() {  
     const authKey = localStorage.getItem("aichacamara_auth_key")
@@ -571,6 +636,187 @@ function handleNewChannel() {
         // Optionally handle the error
     });
 }
+
+
+
+// ----------------------------- Display Thread Info --------------------------
+function handleThreadDisplay(reply_id) {
+    fetch(`/api/channels/replies/${reply_id}/getmessages`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch replies');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.length > 0) {
+                // Display the thread if there are replies
+                displayThread(data);
+            } else {
+                // If there are no replies, show a message
+                displayNoRepliesMessage();
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching replies:', error);
+        });
+}
+
+function displayThread(thread) {
+    console.log(thread)
+    // Assuming there's an element with the id "thread-container" where you want to display the thread
+    const threadContainer = document.getElementById('thread-container');
+    threadContainer.innerHTML = ''; // Clear previous thread
+
+    // Loop through replies and create HTML elements to display them
+    thread.forEach(reply => {
+        let messageElement = document.createElement("message");
+  
+        let authorElement = document.createElement("author");
+        authorElement.textContent = reply.author;
+    
+        let contentElement = document.createElement("content");
+        contentElement.textContent = reply.body;
+
+        // Append author and body elements to the message container
+        messageElement.appendChild(authorElement);
+        messageElement.appendChild(contentElement);
+        messageElement.appendChild(document.createElement('hr'))
+
+        threadContainer.appendChild(messageElement);
+    });
+}
+
+
+function displayNoRepliesMessage() {
+    // Assuming there's an element with the id "thread-container" where you want to display the message
+    const threadContainer = document.getElementById('thread-container');
+    threadContainer.innerHTML = '<p>No replies yet. Be the first!</p>';
+}
+
+
+function postThreadReply() {
+    const path = window.location.pathname;
+
+    const reply_id = parseInt(path.split('/channels/replies/')[1]);
+    const reply_content = document.getElementById("reply-box").value;
+    
+    const authKey = localStorage.getItem("aichacamara_auth_key")
+    const username = localStorage.getItem("username")
+  
+    fetch(`/api/channels/replies/${reply_id}/messages`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-type':'application/json',
+        'Authorization': authKey
+      },
+      
+      body:JSON.stringify({ 
+        body: reply_content,
+        replies_to: reply_id,
+        username: username
+      })
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to post message');
+      }
+      console.log(response)
+      console.log("Reply posted sucessfully!")
+      // If the message is successfully posted, fetch and display updated messages for the thread
+      //fetchMessages(channelID);
+      location.reload()
+    })
+    .catch(error => {
+      console.error('Error posting message:', error);
+    });
+  }
+
+
+  function displayThreadMessages(messages) {
+    let ChatDiv = document.getElementById("message-box2");
+    ChatDiv.innerHTML = ""; // Clear previous messages
+    
+        messages.forEach(single_message => {
+            let messageElement = document.createElement("message");
+        
+            let authorElement = document.createElement("author");
+            authorElement.textContent = single_message.author;
+        
+            let contentElement = document.createElement("content");
+            contentElement.textContent = single_message.body;
+      
+            let buttonElement = document.createElement("button");
+            buttonElement.textContent = `${single_message.replies_count} replies`
+      
+            buttonElement.addEventListener('click', () => {
+              console.log(`checking out this thread with message_id: ${single_message.id}! `)
+      
+                  message_id = single_message.id
+                  channel_id = single_message.channel_id
+                  //handleThreadDisplay(message_id, channel_id )
+              window.location.href = `/channels/replies/${message_id}`
+              //handleThreadDisplay(message_id, channel_id )
+            })
+      
+      
+            messageElement.appendChild(authorElement);
+            messageElement.appendChild(contentElement);
+            messageElement.appendChild(buttonElement)
+            messageElement.appendChild(document.createElement('br'))
+            messageElement.appendChild(document.createElement('br'))
+      
+            const replyButtons = [
+              { id: 'thumbsup', emoji: '👍', count: 0 },
+              { id: 'thumbsdown', emoji: '👎', count: 0 },
+              { id: 'lol', emoji: '😂', count: 0 },
+      
+            ]
+      
+            replyButtons.forEach(button => {
+              const buttonElement = document.createElement('button');
+              buttonElement.classList.add('reaction');
+              buttonElement.id = button.id;
+              buttonElement.textContent = `${button.count} ${button.emoji}`;
+              messageElement.appendChild(buttonElement);
+          });
+        
+         
+              const separator = document.createElement('hr');
+              messageElement.appendChild(separator)
+        
+            // Append the message element to the chat container
+            ChatDiv.appendChild(messageElement);
+    });
+}
+
+
+function fetchReplyMessages() {
+    const path = window.location.pathname;
+    const reply_id = parseInt(path.split('/channels/replies/')[1]);
+
+    fetch(`/api/channels/replies/${reply_id}/messages`)
+      .then(response => response.json())
+      .then(messages => {
+        // Check if there are actual messages
+        if (messages.length === 0) {
+          clearThreadDummyMessages(); // Clear dummy messages
+        } else {
+          displayThreadMessages(messages); // Display actual messages
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching messages:', error);
+      });
+  }
+
+  function clearThreadDummyMessages() {
+    let noMessagesDiv = document.getElementById("messages-3col");
+    noMessagesDiv.innerHTML = ""; // Clear the container
+    noMessagesDiv.style.display = "block";
+  }  
+    // then fetch reply and send reply_id to add as the replies to part of the message 
+
 
 
 // ----------------------------- Page Load Functions ---------------------------
