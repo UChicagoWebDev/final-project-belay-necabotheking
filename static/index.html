@@ -1,0 +1,324 @@
+<html>
+<head>
+  <title>Belay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rowdies:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+  <link rel="stylesheet" type="text/css" href="/static/styling.css"></link>
+</head>
+<body>
+
+<!-- Unauthenticated UI - "/" -->
+<div class="splash container" id="loggedOut">
+    <div class="hero">
+      <div class="logo">
+        <img src="/static/belay.png">
+      </div>
+      <h1>Belay</h1>
+      <!-- <h3>Chat Channels</h3> -->
+      <div class="button-container">
+        <button id="signup-go" class="signup">Signup</button> 
+        <button id="login-go" class="login-button">Login</button>
+      </div>
+    </div> 
+</div> <!-- end .splash -->
+
+
+<!-- Profile Page - "/profile" -->
+<div class="profile">
+    <div id="profile-page"> 
+      <div class="hero">
+          <div class="logo">
+            <img src="/static/belay.png">
+          </div>
+          <h2>Belay</h2>
+          <!-- <h3>Chat Channels</h3> -->
+      </div>
+      <div class="header">
+          Welcome back to Belay, <span class="username" id="profile-username"></span>!
+          <!-- input = Username -->
+      </div>
+      <div class="auth container">
+          <div class="alignedForm">
+          <div class="inputs">
+              <label for="username">Change Username: </label>
+              <input name="username" id="profileuser" value="">
+              <button id="updateuser">update</button>
+          </div>
+          <br>
+          <div class ="inputs">
+              <label for="password">Change Password: </label>
+              <input type="password" name="password" id="profilepass" value="">
+              <button id="updatepass">update</button>
+          </div>
+          <br>
+          <button class="exit return" id="go-back">Return to Channels</button>
+          <br>
+          <button class="exit logout" id="logout-button">Log out</button>
+          </div>
+      </div>
+    </div> 
+</div>  <!-- end .profile -->
+
+
+<!-- Login Page - "/login" -->
+<div class="login"> 
+  <div id="login-page">
+    <div class="hero">
+      <div class="logo">
+        <img src="/static/belay.png">
+      </div>
+      <h2>Belay</h2>
+      <!-- <h3>Chat Channels</h3> -->
+    </div>
+    <div class="header">
+      Enter Your Username and Password to Login:
+    </div>
+    <div class="auth container">
+        <div class="alignedForm">
+        <div class="inputs">
+            <label for="username">Username: </label>
+            <input id="login-username" value="">
+        </div>
+        <br>
+        <div class ="inputs">
+            <label for="password">Password: </label>
+            <input type="password" id="login-password" value="">
+            <button id="login-button" class="login-button">Login!</button>
+        </div>
+        <br>
+        <div class="oops">
+          <div class="failed">
+            <div class="message hide">
+              Oops, that account doesn't exist! Signup to get started:
+            </div>
+            <button id="signup-button" class="new">Signup</button>
+          </div>
+        </div>
+        </div>
+    </div>
+  </div>
+</div> <!-- end .login -->
+
+<!-- Two column channels page -->
+<div class ="channels"> 
+  <div class = "top-header">
+      <h3>Belay</h3>
+      <img class="small-logo" src="/static/belay.png">
+      <h4>Welcome back to Belay, <span class="username" id="two-username"></span>!</h4>
+      <button class="profile-button1" id="profile-btn">Edit Profile</button>
+  </div>
+
+  <div class="page-container">
+      <div class="descriptions">  </div>
+      <div class="descriptions" id="name-2col"> </div>
+      <div>
+        <left> Select a Channel: </left>
+        <br>
+        <inside id="channels-2col">
+
+        <div class="channel-option" number="1">
+          <name> Channel Name </name>
+          <br>
+          <unread> 3 unread </unread>
+        </div>
+        <div class="channel-option">
+          <name> Channel Name </name>
+          <br>
+          <unread> 3 unread </unread>
+        </div>
+        <div class="channel-option">
+          <name> Channel Name </name>
+          <br>
+          <unread> 3 unread </unread>
+        </div>
+        <div class="channel-option" id="selected">
+          <name> Channel 4 </name>
+          <br>
+          <unread> 3 unread </unread>
+        </div>
+        <div class="channel-option">
+          <name> Channel Name </name>
+          <br>
+          <unread> 3 unread </unread>
+        </div>
+    </inside>
+        <button id="create-channel"> &#x2795</button>
+        <div id="un-hide1" class= "hide">
+          <input id="channel-set1" value="" placeholder="Enter the new channel name">
+          <button id="create-channel1"> Create Channel</button>
+        </div>
+      </div>
+      
+      <div class="right" id="messages-2col">
+        <div class="right" id="message-box">
+        <message>
+          <author> Jem</author>
+          <content> What's up!!</content>
+          <img>
+          <button> 3 replies </button>
+          <hr>
+        </message>
+    
+        <message>
+          <author> Jem</author>
+          <content> What's up!!</content>
+          <img>
+          <button> 3 replies </button>
+          <button class="reaction" id="heart"> 0 &#x2764; </button>
+          <button class="reaction" id="thumbsup"> 5 &#x1F44D; </button>
+          <button class="reaction" id="happyface"> 5 &#x1F600; </button>
+          <button class="reaction" id="laughing"> 2 &#x1F602; </button>
+          <button class="reaction" id="star"> 2 &#x2B50; </button>
+          <button class="reaction" id="thumbsdown"> 0 &#x1F44E; </button>
+          <hr>
+        </message>
+    
+        <message>
+          <author> Jem</author>
+          <content> What's up!!</content>
+          <img>
+          <button> 3 replies </button>
+          <hr>
+        </message>
+    
+        <message>
+          <author> Jem</author>
+          <content> What's up!!</content>
+          <img>
+          <button> 3 replies </button>
+          <hr>
+        </message>
+    </div>
+
+
+        <br>
+        <textarea id="textInput" name="comment" placeholder="Type your message here"></textarea>
+        <br>
+        <button id="post-message">Post Message</button>
+      </div>
+    
+  </div>
+</div> <!-- end .channels --->
+
+
+<!-- Three column channels page --> 
+<div class="threads">
+  <div class = "top-header">
+    <h3>Belay</h3>
+    <img class="small-logo" src="/static/belay.png">
+    <h4>Welcome back to Belay, <span class="username" id="three-username"></span>!</h4>
+    <button class="profile-button2" id="profile-btn-2">Edit Profile</button>
+  </div>
+  
+  <div class="page-container">
+      <div class="descriptions">  </div>
+      <div class="descriptions" id="name-3col"> </div>
+
+      <div id="thread-title"> 
+        <button class="reaction" id="exit-threads"> &#x274C; </button>
+        <small> Replies To </small>
+        <message>
+          <author> Jem</author>
+          <content> What's up!!</content>
+          <img>
+          <button class="reaction" id="heart"> 0 &#x2764; </button>
+          <button class="reaction" id="thumbsup"> 5 &#x1F44D; </button>
+          <button class="reaction" id="happyface"> 5 &#x1F600; </button>
+          <button class="reaction" id="laughing"> 2 &#x1F602; </button>
+          <button class="reaction" id="star"> 2 &#x2B50; </button>
+          <button class="reaction" id="thumbsdown"> 0 &#x1F44E; </button>
+          <br>
+        </message>
+      </div>
+
+      <div >
+        <left> Select a Channel: </left>
+        <inside id="channels-3col"> 
+          
+        
+        <div class="channel-option" id="selected">
+          <name> Channel 4 </name>
+          <br>
+          <unread> 3 unread </unread>
+        </div>
+        <div class="channel-option">
+          <name> Channel Name </name>
+          <br>
+          <unread> 3 unread </unread>
+        </div>
+        </inside>
+        <button id="create-channel2"> &#x2795</button>
+        <div>
+          <input id="channel-set2" value="" placeholder="Enter the new channel name">
+          <button id="create-channel3"> Create Channel</button>
+        </div>
+      </div>
+      
+      <div class="right">
+        <message>
+          <author> Jem</author>
+          <content> What's up!!</content>
+          <img>
+          <button> 3 replies </button>
+          <hr>
+        </message>
+    
+        <message>
+          <author> Jem</author>
+          <content> What's up!!</content>
+          <img>
+          <button> 3 replies </button>
+          <button class="reaction" id="heart"> 0 &#x2764; </button>
+          <button class="reaction" id="thumbsup"> 5 &#x1F44D; </button>
+          <button class="reaction" id="happyface"> 5 &#x1F600; </button>
+          <button class="reaction" id="laughing"> 2 &#x1F602; </button>
+          <button class="reaction" id="star"> 2 &#x2B50; </button>
+          <button class="reaction" id="thumbsdown"> 0 &#x1F44E; </button>
+          <hr>
+        </message>
+    
+        <message>
+          <author> Jem</author>
+          <content> What's up!!</content>
+          <img>
+          <button class = "selected-thread"> 3 replies </button>
+          <hr>
+        </message>
+    
+        <message>
+          <author> Jem</author>
+          <content> What's up!!</content>
+          <img>
+          <button> 3 replies </button>
+          <hr>
+        </message>
+        <br>
+        <textarea id="post-box2" name="comment" placeholder= "Add a chat to this channel"></textarea>
+        <br>
+        <button id="post-button2">Post Message</button>
+      </div>
+
+      <div class="open-thread">
+        
+        <message>
+          <author> Bill</author>
+          <content> Hello All!</content>
+          <img>
+          <hr>
+        </message>
+
+        <message> 
+          <textarea id="reply-box" name="comment" placeholder= "Add a reply to the thread"></textarea>
+          <button id="reply-button">Post Reply</button>
+        </message>
+        
+        
+      </div> 
+  </div>
+</div> <!-- end .threads -->
+
+<script src="/static/script.js"> </script>
+</body>
+</html> 

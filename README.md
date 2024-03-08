@@ -6,6 +6,13 @@
 
 https://classroom.github.com/a/qeha1A1z
 
+## Sources 
+- [slack-clone-ui by Sirneij](https://github.com/Sirneij/slack-clone-ui/tree/master)
+- Sarah 
+- ChatGPT for debugging
+
+
+
 ## Introduction
 
 As a capstone project for Web Development, we're going to combine the various
